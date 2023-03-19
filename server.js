@@ -6,7 +6,6 @@ const flash = require('connect-flash');
 const app = express();
 const ejs = require ('ejs');
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
 let con = require ('./data');//un point devant data parce que le fichier
 // data.js se trouve dans le même endroit que le fichier server.js
 
@@ -39,12 +38,7 @@ const indexRouter = require('./routes/index');
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-//pour crypter le mot de passe de l'utilisateur
-async function encryptPassword(password) {
-	const salt = await bcrypt.genSalt(10);
-	const hashedPassword = await bcrypt.hash(password, salt);
-	return hashedPassword;
-  }
+
 
 //voici comment on appelle nos routes qui sont le fichier index.js
 app.use('/', indexRouter);
@@ -65,67 +59,56 @@ app.use(function(request, response, next) {
   
 
 //inscription de l'utilisateur
-app.post('/insert', async (request, response) => {
-	const pseudo = request.body.pseudo;
+app.post('/insert', (request, response) => {
+    const pseudo = request.body.pseudo;
+    const email = request.body.email;
+    const pass = request.body.pass;
+    const profil = request.body.profil;
+    
+    const sql = 'INSERT INTO gaming (pseudo, email, pass, profil) VALUES (?, ?, ?, ?)';
+    con.query(sql, [pseudo, email, pass, profil], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+            response.status(500).send('Erreur lors de l\'insertion de l\'utilisateur');
+        } else {
+            console.log('Utilisateur inséré avec succès');
+            request.flash ('success', 'Utilisateur inséré avec succès');
+            response.redirect('/connect');
+        }
+    });
+});
+
+  
+  //connexion de l'utilisateur
+  app.post('/connecter', (request, response) => {
 	const email = request.body.email;
 	const pass = request.body.pass;
-	const profil = request.body.profil;
-
-	const encryptedPassword = await encryptPassword(pass); // Cryptage du mot de passe
   
-	// Requête SQL pour l'insertion de l'utilisateur avec le mot de passe crypté
-	const sql = 'INSERT INTO gaming (pseudo, email, pass, profil) VALUES (?, ?, ?, ?)';
-	con.query(sql, [pseudo, email, encryptedPassword, profil], (error, results, fields) => {
+	const sql = 'SELECT * FROM gaming WHERE email = ?';
+	con.query(sql, [email], (error, results, fields) => {
 	  if (error) {
 		console.error(error);
-		response.status(500).send('Erreur lors de l\'insertion de l\'utilisateur');
-	  } else {
-		console.log('Utilisateur inséré avec succès');
-		// response.send('Utilisateur inséré avec succès');
-		//request.session.message = {type: 'success', text: 'Utilisateur inséré avec succès'}; 
-		request.flash ('success', 'Utilisateur inséré avec succès');
+		request.flash('error', 'Erreur lors de la connexion');
 		response.redirect('/connect');
+	  } else if (results.length === 0) {
+		request.flash('error', 'Email ou mot de passe invalide');
+		response.redirect('/connect');
+	  } else {
+		const utilisateur = results[0];
+  
+		if (pass !== utilisateur.pass) {
+		  request.flash('error', 'Email ou mot de passe invalide');
+		  response.redirect('/connect');
+		} else {
+		  request.session.utilisateurId = utilisateur.id;
+		  request.session.utilisateurPseudo = utilisateur.pseudo;
+		  request.session.utilisateurProfil = utilisateur.profil;
+		  request.flash('success', 'Utilisateur connecté!');
+		  response.redirect('/accueil');
+		}
 	  }
 	});
   });
-  
-  //connexion de l'utilisateur
-app.post('/connecter', (request, response) => {
-  const email = request.body.email;
-  const pass = request.body.pass;
-
-  const sql = 'SELECT * FROM gaming WHERE email = ?';
-  con.query(sql, [email], (error, results, fields) => {
-    if (error) {
-      console.error(error);
-      request.flash('error', 'Erreur lors de la connexion');
-      response.redirect('/connect');
-    } else if (results.length === 0) {
-      request.flash('error', 'Email ou mot de passe invalide');
-      response.redirect('/connect');
-    } else {
-      const utilisateur = results[0];
-
-      bcrypt.compare(pass, utilisateur.pass, (error, match) => {
-        if (error) {
-          console.error(error);
-          request.flash('error', 'Erreur lors de la connexion');
-          response.redirect('/connect');
-        } else if (!match) {
-          request.flash('error', 'Email ou mot de passe invalide');
-          response.redirect('/connect');
-        } else {
-          request.session.utilisateurId = utilisateur.id;
-          request.session.utilisateurPseudo = utilisateur.pseudo;
-          request.session.utilisateurProfil = utilisateur.profil;
-          request.flash('success', 'Utilisateur connecté!');
-          response.redirect('/accueil');
-        }
-      });
-    }
-  });
-});
-
 
 //recup session utilisateur
   app.get('/utilisateur', (req, res) => {
