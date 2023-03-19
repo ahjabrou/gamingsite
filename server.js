@@ -7,7 +7,6 @@ const app = express();
 const ejs = require ('ejs');
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
-const PORT = require('./config');
 let con = require ('./data');//un point devant data parce que le fichier
 // data.js se trouve dans le même endroit que le fichier server.js
 
@@ -150,4 +149,4 @@ app.post('/connecter', (request, response) => {
   
 
   
-app.listen(PORT);
+app.listen(5000);
