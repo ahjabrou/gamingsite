@@ -52,7 +52,7 @@ router.get('/accueil', (req, res) => {
 	  return;
 	}
   
-	const sql = 'SELECT * FROM gaming WHERE id = ?';
+	const sql = 'SELECT * FROM gamer WHERE id = ?';
 	con.query(sql, [userId], (error, results) => {
 	  if (error) {
 		console.error(error);

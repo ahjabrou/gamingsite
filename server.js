@@ -66,7 +66,7 @@ app.post('/insert', (request, response) => {
     const pass = request.body.pass;
     const profil = request.body.profil;
     
-    const sql = 'INSERT INTO gaming (pseudo, email, pass, profil) VALUES (?, ?, ?, ?)';
+    const sql = 'INSERT INTO gamer (pseudo, email, pass, profil) VALUES (?, ?, ?, ?)';
     con.query(sql, [pseudo, email, pass, profil], (error, results, fields) => {
         if (error) {
             console.error(error);
@@ -85,7 +85,7 @@ app.post('/insert', (request, response) => {
 	const email = request.body.email;
 	const pass = request.body.pass;
   
-	const sql = 'SELECT * FROM gaming WHERE email = ?';
+	const sql = 'SELECT * FROM gamer WHERE email = ?';
 	con.query(sql, [email], (error, results, fields) => {
 	  if (error) {
 		console.error(error);
@@ -118,7 +118,7 @@ app.post('/insert', (request, response) => {
 	if (!utilisateurId) {
 	  res.status(401).send('Utilisateur non connecté');
 	} else {
-	  const sql = 'SELECT pseudo, profil FROM gaming WHERE id = ?';
+	  const sql = 'SELECT pseudo, profil FROM gamer WHERE id = ?';
 	  con.query(sql, [utilisateurId], (error, results, fields) => {
 		if (error) {
 		  console.error(error);
