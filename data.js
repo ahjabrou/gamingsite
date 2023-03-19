@@ -5,6 +5,11 @@ var con = mysql.createConnection({
   user: "root",
   port:6726,
   password: "qlrVBkmTI253m4FsWHHU"
+
+  // host: "localhost",
+  // database: "gaming",
+  // user: "root",
+  // password: ""
 });
 module.exports = con;
 
