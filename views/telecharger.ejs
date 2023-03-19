@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Téléchargement</title>
+    
+  </head>
+  <body>
+<%- include('index.ejs') %>
+
+    <section class="container">
+
+      <div class="card mb-3" style="padding:10px;">
+        <h1 class="text-center" style="color: black;">Téléchargement</h1>
+          <div class="bd-example" >
+    
+              <div class="col mb-4">
+                <div class="p-3 border bg-light">
+                <div class="row text-center">
+                  <ul>
+                    <!--pour afficher la liste des fichiers téléchargeables et lorsqu'on clique 
+                    sur un des fichiers ça nous amène sur le lien de google drive-->
+                  <% for (const file of files) { %>
+                    <li style="padding:5px;">
+                      <button class="btn btn-outline-custom custom-border" type="submit">
+
+                      <a href="<%= file.url %>">
+                       
+                            <%= file.name %>
+                        
+                      </a>
+                    </button>
+                    </li>
+                  <% } %>
+                  </ul> 
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+
+  </body>
+</html>
