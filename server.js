@@ -1,6 +1,7 @@
 // server.js (le fichier principal serveur)
 const config = require('./config');
 const express = require('express');
+require('dotenv').config()
 const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
@@ -132,4 +133,4 @@ app.post('/insert', (request, response) => {
   
 
   
-app.listen(5000);
+app.listen(PORT);
